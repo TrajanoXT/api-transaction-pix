@@ -1,0 +1,17 @@
+package api.transaction.pix.entity;
+
+import api.transaction.pix.enuns.PixKeyType;
+import jakarta.persistence.*;
+import org.springframework.boot.webmvc.autoconfigure.WebMvcProperties;
+
+@Entity
+public class PixKey {
+    @Id
+    @GeneratedValue
+    private Long id;
+    private String key;
+    @Enumerated(EnumType.STRING)
+    private PixKeyType type;
+    @ManyToOne
+    private User owner;
+}
