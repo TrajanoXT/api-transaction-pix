@@ -1,6 +1,6 @@
 package api.transaction.pix.entity;
 
-import api.transaction.pix.enuns.TransactionStatus;
+import api.transaction.pix.enums.TransactionStatus;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;

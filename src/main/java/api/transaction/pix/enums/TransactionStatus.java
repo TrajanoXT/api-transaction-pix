@@ -1,4 +1,4 @@
-package api.transaction.pix.enuns;
+package api.transaction.pix.enums;
 
 public enum TransactionStatus {
     CREATED,
