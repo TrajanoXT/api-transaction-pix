@@ -28,6 +28,8 @@ public class JwtSecurity {
                 .authorizeHttpRequests(authorize -> authorize
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers(HttpMethod.POST, "/create").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/create").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/pix-key").permitAll()
                         .anyRequest().authenticated())
                 .build();
     }

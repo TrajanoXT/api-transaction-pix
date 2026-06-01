@@ -1,15 +1,16 @@
 package api.transaction.pix.service;
 
 import api.transaction.pix.dto.CreateUserRequest;
+import api.transaction.pix.dto.UserResponseDto;
 import api.transaction.pix.entity.User;
 import api.transaction.pix.exception.CpfAlreadyExistsException;
 import api.transaction.pix.repository.UserRepository;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -60,6 +61,19 @@ public class UserService {
         user.setBalance(BigDecimal.ZERO);
         userRepository.save(user);
         return user;
+    }
+
+    public List<User> listUsers() {
+        List<User> users = userRepository.findAll();
+
+        List<UserResponseDto> dtos=users.stream()
+                .map(user -> new UserResponseDto(user.getName(),user.getCpf()))
+                .toList();
+        return users;
+    }
+
+    public void delete(UUID id){
+        
     }
 
 }

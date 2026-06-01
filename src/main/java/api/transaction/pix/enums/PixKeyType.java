@@ -4,5 +4,5 @@ public enum PixKeyType {
     CPF,
     EMAIL,
     PHONE,
-    RAMDOM
+    RANDOM
 }
