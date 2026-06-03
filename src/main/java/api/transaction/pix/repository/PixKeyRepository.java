@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface PixKeyRepository extends JpaRepository<PixKey, UUID> {
     Optional<PixKey> findByKey(String key);
+    boolean existsByKey(String key);
 }

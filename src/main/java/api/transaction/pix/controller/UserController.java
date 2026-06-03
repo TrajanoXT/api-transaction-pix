@@ -16,16 +16,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    @PostMapping("/create")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<User> createUser(@RequestBody CreateUserRequest request) {
-        User user = userService.createUser(request);
-
-        return ResponseEntity.ok().body(user);
+    @PostMapping
+    public ResponseEntity<UserResponseDto> createUser(@RequestBody CreateUserRequest request) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
     }
-    @GetMapping("/list")
-    @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<List<User>> listUsers(){
+    @GetMapping
+    public ResponseEntity<List<UserResponseDto>> listUsers(){
         return ResponseEntity.ok(userService.listUsers());
     }
 

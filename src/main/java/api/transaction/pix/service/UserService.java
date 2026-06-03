@@ -4,6 +4,7 @@ import api.transaction.pix.dto.CreateUserRequest;
 import api.transaction.pix.dto.UserResponseDto;
 import api.transaction.pix.entity.User;
 import api.transaction.pix.exception.CpfAlreadyExistsException;
+import api.transaction.pix.exception.InvalidCpfException;
 import api.transaction.pix.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -48,32 +49,30 @@ public class UserService {
         }
     }
 
-    public User createUser(CreateUserRequest createUserRequest) {
+    public UserResponseDto createUser(CreateUserRequest createUserRequest) {
         User user = new User();
         if(userRepository.existsByCpf(createUserRequest.cpf())) throw  new CpfAlreadyExistsException("CPF already exists");
 
-        if(valid(createUserRequest.cpf())==false){
-            throw new CpfAlreadyExistsException("Invalid CPF [Brazilian taxpayer ID number]");
+        if(!valid(createUserRequest.cpf())){
+            throw new InvalidCpfException("Invalid CPF [Brazilian taxpayer ID number]");
         }
 
-        user.setCpf(createUserRequest.cpf());
+        user.setCpf(clearCpf(createUserRequest.cpf()));
         user.setName(createUserRequest.name());
         user.setBalance(BigDecimal.ZERO);
         userRepository.save(user);
-        return user;
+        return new UserResponseDto(
+                user.getName(),
+                user.getCpf(),
+                user.getBalance(),
+                user.getId()
+        );
     }
 
-    public List<User> listUsers() {
-        List<User> users = userRepository.findAll();
-
-        List<UserResponseDto> dtos=users.stream()
-                .map(user -> new UserResponseDto(user.getName(),user.getCpf()))
+    public List<UserResponseDto> listUsers() {
+        return userRepository.findAll()
+                .stream()
+                .map(user -> new UserResponseDto(user.getName(), user.getCpf(), user.getBalance(), user.getId()))
                 .toList();
-        return users;
     }
-
-    public void delete(UUID id){
-        
-    }
-
 }

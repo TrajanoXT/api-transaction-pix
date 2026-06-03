@@ -1,10 +1,12 @@
 package api.transaction.pix.service;
 
 import api.transaction.pix.dto.PixKeyRequest;
+import api.transaction.pix.dto.PixKeyResponse;
 import api.transaction.pix.entity.PixKey;
 import api.transaction.pix.entity.User;
 import api.transaction.pix.enums.PixKeyType;
 import api.transaction.pix.exception.InvalidPixKeyException;
+import api.transaction.pix.exception.PixKeyAlreadyExistsException;
 import api.transaction.pix.exception.UserNotFoundException;
 import api.transaction.pix.repository.PixKeyRepository;
 import api.transaction.pix.repository.UserRepository;
@@ -21,11 +23,11 @@ public class PixKeyService {
     private final UserRepository userRepository;
 
     private static final String REGEX_CPF = "^\\d{11}$";
-    private static final String REGEX_EMAIL = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
+    private static final String REGEX_EMAIL = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,}$";
     private static final String REGEX_TELEFONE = "^\\+[1-9]\\d{10,14}$";
 
 
-    public PixKey createPixKey(PixKeyRequest dto) {
+    public PixKeyResponse createPixKey(PixKeyRequest dto) {
 
         User owner = userRepository.findById(dto.ownerId())
                 .orElseThrow(() -> new UserNotFoundException("Owner not found"));
@@ -35,6 +37,7 @@ public class PixKeyService {
         if (!isRandom && (dto.key() == null || dto.key().isBlank())) {
             throw new InvalidPixKeyException("Key cannot be null or empty");
         }
+
         String input = dto.key();
         PixKey pixKey = new PixKey();
 
@@ -44,7 +47,9 @@ public class PixKeyService {
             pixKey.setOwner(owner);
         }else {
             String digitsOnly = input.replaceAll("[\\.\\-]", "");
-
+            if (dto.type().equals("CPF") && !Pattern.matches(REGEX_CPF, digitsOnly)) {
+                throw new InvalidPixKeyException("Key does not match CPF format");
+            }
             if (Pattern.matches(REGEX_CPF, digitsOnly)) {
                 pixKey.setType(PixKeyType.CPF);
                 pixKey.setKey(digitsOnly);
@@ -61,7 +66,20 @@ public class PixKeyService {
                 throw new InvalidPixKeyException("Invalid key format or type mismatch");
             }
         }
+        if (pixKeyRepository.existsByKey(pixKey.getKey())) {
+            throw new PixKeyAlreadyExistsException("Pix key already exists");
+        }
+        if (!isRandom && pixKeyRepository.existsByKey(pixKey.getKey())) {
+            throw new PixKeyAlreadyExistsException("Pix key already exists");
+        }
         pixKeyRepository.save(pixKey);
-        return pixKey;
+
+        return new PixKeyResponse(
+               pixKey.getId(),
+                pixKey.getKey(),
+                pixKey.getType(),
+                owner.getId(),
+                owner.getName()
+        );
     }
 }

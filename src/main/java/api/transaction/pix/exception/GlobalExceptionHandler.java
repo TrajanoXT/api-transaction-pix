@@ -43,10 +43,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInvalidPixKeyException(InvalidPixKeyException e){
         return build(HttpStatus.BAD_REQUEST,e.getMessage());
     }
+    @ExceptionHandler(PixKeyAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handlePixKeyAlreadyExistsException(PixKeyAlreadyExistsException e){
+        return build(HttpStatus.CONFLICT,e.getMessage());
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e){
         return build(HttpStatus.INTERNAL_SERVER_ERROR,e.getMessage());
+    }
+    @ExceptionHandler(InvalidCpfException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCpfException(InvalidCpfException e){
+        return build(HttpStatus.BAD_REQUEST,e.getMessage());
     }
 
     private ResponseEntity<ErrorResponse> build(HttpStatus status, String message){

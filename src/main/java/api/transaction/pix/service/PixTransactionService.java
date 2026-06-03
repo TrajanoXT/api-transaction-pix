@@ -27,21 +27,21 @@ public class PixTransactionService {
 
     @Transactional
     public PixTransactionResponse transfer(UUID sender, PixTransactionRequest request) {
+        if (request.amount() == null || request.amount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidAmountException("Invalid amount");
+        }
         User senderUser = userRepository.findByIdWithLock(sender)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
+
 
         PixKey receiverKey = pixKeyRepository.findByKey(request.key())
                 .orElseThrow(()->new PixKeyNotFoundException("Key not found"));
 
-        User receiverUser = receiverKey.getOwner();
+        User receiverUser = userRepository.findByIdWithLock(receiverKey.getOwner().getId())
+                .orElseThrow(()->new UserNotFoundException("Receiver not found"));
 
         if (senderUser.getId().equals(receiverUser.getId())) {
             throw new SelfTransferException("You cannot transfer to yourself");
-        }
-
-        if (request.amount() == null ||
-                request.amount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new InvalidAmountException("Invalid amount");
         }
 
         if (senderUser.getBalance().compareTo(request.amount()) < 0) {
@@ -62,6 +62,8 @@ public class PixTransactionService {
         pixTransaction.setCreatedAt(LocalDateTime.now());
         pixTransaction.setReceiverKey(receiverKey);
         pixTransactionRepository.save(pixTransaction);
+        userRepository.save(senderUser);
+        userRepository.save(receiverUser);
 
         return new PixTransactionResponse(
                 pixTransaction.getId(),

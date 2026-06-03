@@ -11,15 +11,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/transaction")
 @RequiredArgsConstructor
 public class PixTransactionController {
     private final PixTransactionService pixTransactionService;
 
     @PostMapping("/{uuid}")
-    public ResponseEntity<PixTransactionResponse> transaction(@PathVariable UUID uuid,
+    public ResponseEntity<PixTransactionResponse> transaction(@PathVariable UUID senderId,
                                                               @RequestBody PixTransactionRequest pixTransactionRequest) {
-        return ResponseEntity.status(HttpStatus.OK).body(pixTransactionService.transfer(uuid,pixTransactionRequest));
+        return ResponseEntity.status(HttpStatus.CREATED).body(pixTransactionService.transfer(senderId,pixTransactionRequest));
     }
-
 }

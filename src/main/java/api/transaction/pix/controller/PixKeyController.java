@@ -1,6 +1,7 @@
 package api.transaction.pix.controller;
 
 import api.transaction.pix.dto.PixKeyRequest;
+import api.transaction.pix.dto.PixKeyResponse;
 import api.transaction.pix.entity.PixKey;
 import api.transaction.pix.service.PixKeyService;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ public class PixKeyController {
     private final PixKeyService pixKeyService;
 
     @PostMapping
-    public ResponseEntity<PixKey> savePixKey(@RequestBody PixKeyRequest pixKeyRequest){
+    public ResponseEntity<PixKeyResponse> savePixKey(@RequestBody PixKeyRequest pixKeyRequest){
 
         return ResponseEntity.status(HttpStatus.CREATED).body(pixKeyService.createPixKey(pixKeyRequest));
     }
