@@ -4,13 +4,12 @@ import api.transaction.pix.dto.PixKeyRequest;
 import api.transaction.pix.entity.PixKey;
 import api.transaction.pix.entity.User;
 import api.transaction.pix.enums.PixKeyType;
+import api.transaction.pix.exception.InvalidPixKeyException;
+import api.transaction.pix.exception.UserNotFoundException;
 import api.transaction.pix.repository.PixKeyRepository;
 import api.transaction.pix.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.annotations.NotFound;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -29,12 +28,12 @@ public class PixKeyService {
     public PixKey createPixKey(PixKeyRequest dto) {
 
         User owner = userRepository.findById(dto.ownerId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Owner not found"));
+                .orElseThrow(() -> new UserNotFoundException("Owner not found"));
 
         boolean isRandom = "RANDOM".equals(dto.type());
 
         if (!isRandom && (dto.key() == null || dto.key().isBlank())) {
-            throw new IllegalArgumentException("Key cannot be null or empty");
+            throw new InvalidPixKeyException("Key cannot be null or empty");
         }
         String input = dto.key();
         PixKey pixKey = new PixKey();
@@ -59,7 +58,7 @@ public class PixKeyService {
                 pixKey.setKey(input);
                 pixKey.setOwner(owner);
             }else {
-                throw new IllegalArgumentException("Invalid key format or type mismatch");
+                throw new InvalidPixKeyException("Invalid key format or type mismatch");
             }
         }
         pixKeyRepository.save(pixKey);

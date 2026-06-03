@@ -6,11 +6,11 @@ import api.transaction.pix.entity.PixKey;
 import api.transaction.pix.entity.PixTransaction;
 import api.transaction.pix.entity.User;
 import api.transaction.pix.enums.TransactionStatus;
-import api.transaction.pix.exception.CpfAlreadyExistsException;
+import api.transaction.pix.exception.*;
 import api.transaction.pix.repository.PixKeyRepository;
 import api.transaction.pix.repository.PixTransactionRepository;
 import api.transaction.pix.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,25 +27,25 @@ public class PixTransactionService {
 
     @Transactional
     public PixTransactionResponse transfer(UUID sender, PixTransactionRequest request) {
-        User senderUser = userRepository.findById(sender)
-                .orElseThrow(() -> new CpfAlreadyExistsException("User not found"));
+        User senderUser = userRepository.findByIdWithLock(sender)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        PixKey receiverKey = pixKeyRepository.findByKeyValue(request.key())
-                .orElseThrow(()->new CpfAlreadyExistsException("Key not found"));
+        PixKey receiverKey = pixKeyRepository.findByKey(request.key())
+                .orElseThrow(()->new PixKeyNotFoundException("Key not found"));
 
         User receiverUser = receiverKey.getOwner();
 
         if (senderUser.getId().equals(receiverUser.getId())) {
-            throw new IllegalArgumentException("You cannot transfer to yourself");
+            throw new SelfTransferException("You cannot transfer to yourself");
         }
 
         if (request.amount() == null ||
                 request.amount().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Invalid amount");
+            throw new InvalidAmountException("Invalid amount");
         }
 
         if (senderUser.getBalance().compareTo(request.amount()) < 0) {
-            throw new IllegalArgumentException("Insufficient balance");
+            throw new InsufficientBalanceException("Insufficient balance");
         }
 
         senderUser.setBalance(
@@ -53,10 +53,6 @@ public class PixTransactionService {
 
         receiverUser.setBalance(
                 receiverUser.getBalance().add(request.amount()));
-
-        userRepository.save(senderUser);
-        userRepository.save(receiverUser);
-
 
         PixTransaction pixTransaction = new PixTransaction();
         pixTransaction.setSender(senderUser);

@@ -19,8 +19,10 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+    @Column(nullable = false)
     private String name;
-    @Column(unique = true)
+    @Column(unique = true,nullable = false)
     private String cpf;
-    private BigDecimal balance;
+    @Column(nullable = false,precision = 19,scale = 2)
+    private BigDecimal balance=BigDecimal.ZERO;
 }

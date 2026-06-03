@@ -15,6 +15,7 @@ public class PixKey {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+    @Column(unique = true,nullable = false)
     private String key;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

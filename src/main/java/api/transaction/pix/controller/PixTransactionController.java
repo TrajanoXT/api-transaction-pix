@@ -16,10 +16,10 @@ import java.util.UUID;
 public class PixTransactionController {
     private final PixTransactionService pixTransactionService;
 
-    @PostMapping("/{UUID}")
-    public ResponseEntity<PixTransactionResponse> transaction(@PathVariable UUID UUID,
+    @PostMapping("/{uuid}")
+    public ResponseEntity<PixTransactionResponse> transaction(@PathVariable UUID uuid,
                                                               @RequestBody PixTransactionRequest pixTransactionRequest) {
-        return ResponseEntity.status(HttpStatus.OK).body(pixTransactionService.transfer(UUID,pixTransactionRequest));
+        return ResponseEntity.status(HttpStatus.OK).body(pixTransactionService.transfer(uuid,pixTransactionRequest));
     }
 
 }

@@ -32,6 +32,7 @@ public class JwtSecurity {
                         .requestMatchers(HttpMethod.GET, "/swagger-ui/index.html#/").permitAll()
                         .requestMatchers(HttpMethod.GET, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/**").permitAll()
+                        .requestMatchers(HttpMethod.PATCH, "/**").permitAll()
                         .anyRequest().authenticated())
                 .build();
     }
