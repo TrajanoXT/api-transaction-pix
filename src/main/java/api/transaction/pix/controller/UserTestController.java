@@ -3,7 +3,6 @@ package api.transaction.pix.controller;
 import api.transaction.pix.entity.User;
 import api.transaction.pix.service.DepositService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

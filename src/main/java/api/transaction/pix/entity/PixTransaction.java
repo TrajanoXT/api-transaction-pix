@@ -8,6 +8,11 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
+@Table(name = "pix_transactions",indexes = {
+        @Index(name = "idx_pix_sender",columnList = "sender_id"),
+        @Index(name = "idx_pix_receiver", columnList = "receiver_id"),
+        @Index(name = "idx_pix_status", columnList = "status")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -33,4 +38,10 @@ public class PixTransaction {
 
     @Enumerated(EnumType.STRING)
     private TransactionStatus status;
+    private LocalDateTime authorizedAt;
+    private LocalDateTime processingAt;
+    private LocalDateTime completedAt;
+    private LocalDateTime failedAt;
+    private LocalDateTime reversedAt;
+    private String failReason;
 }

@@ -5,11 +5,13 @@ import api.transaction.pix.dto.UserResponseDto;
 import api.transaction.pix.entity.User;
 import api.transaction.pix.exception.CpfAlreadyExistsException;
 import api.transaction.pix.exception.InvalidCpfException;
+import api.transaction.pix.exception.UserNotFoundException;
 import api.transaction.pix.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.UUID;
 
@@ -74,5 +76,20 @@ public class UserService {
                 .stream()
                 .map(user -> new UserResponseDto(user.getName(), user.getCpf(), user.getBalance(), user.getId()))
                 .toList();
+    }
+    public UserResponseDto home(UUID sender) {
+        User user =userRepository.findById(sender)
+                .orElseThrow(()->new UserNotFoundException("User not found"));
+        return new UserResponseDto(
+                user.getName(),
+                user.getCpf(),
+                user.getBalance(),
+                user.getId()
+        );
+    }
+    public String getTotalBalance() {
+        BigDecimal balance=userRepository.getTotalBalance();
+        DecimalFormat  df = new DecimalFormat("#,##0.00");
+        return df.format(balance);
     }
 }

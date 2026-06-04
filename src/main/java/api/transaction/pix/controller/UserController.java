@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/user")
@@ -24,6 +26,15 @@ public class UserController {
     public ResponseEntity<List<UserResponseDto>> listUsers(){
         return ResponseEntity.ok(userService.listUsers());
     }
-
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserResponseDto> getUser(@PathVariable UUID userId){
+        return ResponseEntity.ok(userService.home(userId));
+    }
+    @GetMapping("/balance-total")
+    public ResponseEntity<String> balance(){
+        return ResponseEntity.ok(
+                "<style>*{background-color:black;color:white;display:flex;justify:center;align-items:center;height:100vh}</style>"+
+                userService.getTotalBalance());
+    }
 
 }

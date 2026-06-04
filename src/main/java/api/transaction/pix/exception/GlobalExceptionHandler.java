@@ -52,6 +52,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleException(Exception e){
         return build(HttpStatus.INTERNAL_SERVER_ERROR,e.getMessage());
     }
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException e){
+        return build(HttpStatus.INTERNAL_SERVER_ERROR,e.getMessage());
+    }
     @ExceptionHandler(InvalidCpfException.class)
     public ResponseEntity<ErrorResponse> handleInvalidCpfException(InvalidCpfException e){
         return build(HttpStatus.BAD_REQUEST,e.getMessage());
