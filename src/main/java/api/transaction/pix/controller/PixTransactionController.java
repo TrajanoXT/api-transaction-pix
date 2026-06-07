@@ -2,10 +2,8 @@ package api.transaction.pix.controller;
 
 import api.transaction.pix.dto.PixTransactionRequest;
 import api.transaction.pix.dto.PixTransactionResponse;
-import api.transaction.pix.dto.UserResponseDto;
 import api.transaction.pix.service.PixTransactionService;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

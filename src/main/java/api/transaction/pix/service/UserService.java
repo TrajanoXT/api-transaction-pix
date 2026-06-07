@@ -6,6 +6,7 @@ import api.transaction.pix.entity.User;
 import api.transaction.pix.exception.CpfAlreadyExistsException;
 import api.transaction.pix.exception.InvalidCpfException;
 import api.transaction.pix.exception.UserNotFoundException;
+import api.transaction.pix.mapper.UserMapper;
 import api.transaction.pix.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     public static String clearCpf(String cpf) {
         if (cpf == null) return null;
@@ -52,23 +54,14 @@ public class UserService {
     }
 
     public UserResponseDto createUser(CreateUserRequest createUserRequest) {
-        User user = new User();
-        if(userRepository.existsByCpf(createUserRequest.cpf())) throw  new CpfAlreadyExistsException("CPF already exists");
-
-        if(!valid(createUserRequest.cpf())){
+        String cleanCpf = clearCpf(createUserRequest.cpf());
+        if(userRepository.existsByCpf(cleanCpf)) throw  new CpfAlreadyExistsException("CPF already exists");
+        if(!valid(cleanCpf)){
             throw new InvalidCpfException("Invalid CPF [Brazilian taxpayer ID number]");
         }
-
-        user.setCpf(clearCpf(createUserRequest.cpf()));
-        user.setName(createUserRequest.name());
-        user.setBalance(BigDecimal.ZERO);
+        User user = userMapper.toEntity(createUserRequest);
         userRepository.save(user);
-        return new UserResponseDto(
-                user.getName(),
-                user.getCpf(),
-                user.getBalance(),
-                user.getId()
-        );
+        return userMapper.toResponse(user);
     }
 
     public List<UserResponseDto> listUsers() {

@@ -1,6 +1,5 @@
 package api.transaction.pix.dto;
 
-
 import java.util.UUID;
 
 public record PixKeyRequest(

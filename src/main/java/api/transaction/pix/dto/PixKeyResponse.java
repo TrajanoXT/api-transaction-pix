@@ -1,7 +1,6 @@
 package api.transaction.pix.dto;
 
 import api.transaction.pix.enums.PixKeyType;
-
 import java.util.UUID;
 
 public record PixKeyResponse (

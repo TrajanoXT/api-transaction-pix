@@ -18,6 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class JwtSecurity {
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         return http
@@ -26,16 +27,14 @@ public class JwtSecurity {
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/create").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/create").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/pix-key").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/swagger-ui/index.html#/").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT,"/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/**").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/**").permitAll()
                         .anyRequest().authenticated())
                 .build();
     }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration){
         return authenticationConfiguration.getAuthenticationManager();

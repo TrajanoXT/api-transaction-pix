@@ -12,7 +12,6 @@ import api.transaction.pix.repository.PixKeyRepository;
 import api.transaction.pix.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.UUID;
 import java.util.regex.Pattern;
 
