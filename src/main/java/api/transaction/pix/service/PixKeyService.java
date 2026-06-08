@@ -8,6 +8,7 @@ import api.transaction.pix.enums.PixKeyType;
 import api.transaction.pix.exception.InvalidPixKeyException;
 import api.transaction.pix.exception.PixKeyAlreadyExistsException;
 import api.transaction.pix.exception.UserNotFoundException;
+import api.transaction.pix.mapper.PixKeyMapper;
 import api.transaction.pix.repository.PixKeyRepository;
 import api.transaction.pix.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import java.util.regex.Pattern;
 public class PixKeyService {
     private final PixKeyRepository pixKeyRepository;
     private final UserRepository userRepository;
+    private final PixKeyMapper pixKeyMapper;
 
     private static final String REGEX_CPF = "^\\d{11}$";
     private static final String REGEX_EMAIL = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,}$";
@@ -73,12 +75,6 @@ public class PixKeyService {
         }
         pixKeyRepository.save(pixKey);
 
-        return new PixKeyResponse(
-               pixKey.getId(),
-                pixKey.getKey(),
-                pixKey.getType(),
-                owner.getId(),
-                owner.getName()
-        );
+        return pixKeyMapper.toResponse(pixKey,owner);
     }
 }

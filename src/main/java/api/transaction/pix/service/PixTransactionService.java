@@ -8,6 +8,7 @@ import api.transaction.pix.entity.PixTransaction;
 import api.transaction.pix.entity.User;
 import api.transaction.pix.enums.TransactionStatus;
 import api.transaction.pix.exception.*;
+import api.transaction.pix.mapper.PixTransactionMapper;
 import api.transaction.pix.repository.PixKeyRepository;
 import api.transaction.pix.repository.PixTransactionRepository;
 import api.transaction.pix.repository.UserRepository;
@@ -25,18 +26,25 @@ public class PixTransactionService {
     private final PixTransactionRepository pixTransactionRepository;
     private final PixKeyRepository pixKeyRepository;
     private final UserRepository userRepository;
+    private final PixTransactionMapper pixTransactionMapper;
 
     @Transactional
     public PixTransactionResponse transfer(UUID senderId,PixTransactionRequest request){
         if (request.amount()==null||request.amount().compareTo(BigDecimal.ZERO)<=0){
             throw new InvalidAmountException("Invalid amount");
         }
+        /* User Sender */
         User senderUser = userRepository.findByIdWithLock(senderId)
                 .orElseThrow(()->new UserNotFoundException("User not found"));
+
+        /* User reiver key */
         PixKey receiverKey = pixKeyRepository.findByKey(request.key())
                 .orElseThrow(()->new PixKeyNotFoundException("Key not found"));
+
+        /* User reiver*/
         User receiverUser = userRepository.findByIdWithLock(receiverKey.getOwner().getId())
                 .orElseThrow(()->new UserNotFoundException("Receiver not found"));
+
         if (senderUser.getId().equals(receiverUser.getId())){
             throw new SelfTransferException("Cannot transfer self transfer");
         }
@@ -44,13 +52,7 @@ public class PixTransactionService {
             throw new InsufficientBalanceException("Insufficient balance");
         }
 
-        PixTransaction pixTransaction = new PixTransaction();
-        pixTransaction.setSender(senderUser);
-        pixTransaction.setReceiver(receiverUser);
-        pixTransaction.setAmount(request.amount());
-        pixTransaction.setReceiverKey(receiverKey);
-        pixTransaction.setStatus(TransactionStatus.CREATED);
-        pixTransaction.setCreatedAt(LocalDateTime.now());
+        PixTransaction pixTransaction = pixTransactionMapper.toEntity(senderUser,receiverUser,request,receiverKey);
         pixTransactionRepository.save(pixTransaction);
 
         pixTransaction.setStatus(pixTransaction.getStatus().transitionTo(TransactionStatus.AUTHORIZED));
@@ -70,14 +72,7 @@ public class PixTransactionService {
         pixTransaction.setCompletedAt(LocalDateTime.now());
         pixTransactionRepository.save(pixTransaction);
 
-        return new PixTransactionResponse(
-                pixTransaction.getId(),
-                pixTransaction.getAmount(),
-                receiverUser.getName(),
-                receiverKey.getKey(),
-                pixTransaction.getStatus(),
-                pixTransaction.getCreatedAt()
-        );
+        return pixTransactionMapper.toResponse(pixTransaction,receiverUser,receiverKey);
     }
     @Transactional
     public void fail(UUID transactionId,String reason){
