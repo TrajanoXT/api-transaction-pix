@@ -28,9 +28,9 @@ public class PixKeyService {
     private static final String REGEX_TELEFONE = "^\\+[1-9]\\d{10,14}$";
 
 
-    public PixKeyResponse createPixKey(PixKeyRequest dto) {
+    public PixKeyResponse createPixKey(PixKeyRequest dto,UUID idUser) {
 
-        User owner = userRepository.findById(dto.ownerId())
+        User owner = userRepository.findById(idUser)
                 .orElseThrow(() -> new UserNotFoundException("Owner not found"));
 
         boolean isRandom = "RANDOM".equals(dto.type());
