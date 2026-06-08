@@ -18,10 +18,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+
     @PostMapping
     public ResponseEntity<UserResponseDto> createUser(@RequestBody CreateUserRequest request) {
             return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
     }
+
     @GetMapping
     public ResponseEntity<List<UserResponseDto>> listUsers(){
         return ResponseEntity.ok(userService.listUsers());
@@ -30,11 +32,4 @@ public class UserController {
     public ResponseEntity<UserResponseDto> getUser(@PathVariable UUID userId){
         return ResponseEntity.ok(userService.home(userId));
     }
-    @GetMapping("/balance-total")
-    public ResponseEntity<String> balance(){
-        return ResponseEntity.ok(
-                "<style>*{background-color:black;color:white;display:flex;justify:center;align-items:center;height:100vh}</style>"+
-                userService.getTotalBalance());
-    }
-
 }
